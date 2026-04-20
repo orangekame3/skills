@@ -23,7 +23,7 @@ from pathlib import Path
 SCRIPTS_DIR = Path(__file__).parent
 OUTDIR = "/tmp/arxiv_raw"
 
-DAILY_TAGS = ["general", "superconducting", "surface_code", "calibration", "ml_calibration", "auto_calibration"]
+DAILY_TAGS = ["general", "rss", "superconducting", "surface_code", "calibration", "ml_calibration", "auto_calibration"]
 DEEP_TAGS = ["deep_surface", "deep_sc_calib", "deep_cloud", "deep_decoder", "deep_llm", "deep_auto", "deep_optim"]
 
 
@@ -46,7 +46,16 @@ def step_fetch(keyword: str = "", skip_deep: bool = False) -> dict:
     result = run(cmd)
     print(result.stderr, end="", file=sys.stderr)
 
-    return json.loads(result.stdout)
+    if result.returncode != 0 or not result.stdout.strip():
+        print("Fetch script failed or returned empty output", file=sys.stderr)
+        # Return a minimal manifest indicating RSS-only fallback
+        return {"rate_limited": True, "files": {}}
+
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as e:
+        print(f"Failed to parse fetch manifest: {e}", file=sys.stderr)
+        return {"rate_limited": True, "files": {}}
 
 
 def step_parse(manifest: dict) -> tuple[list[str], list[str]]:

@@ -46,14 +46,22 @@ SLEEP_BETWEEN = 5  # seconds between requests
 BACKOFF_TIMES = [10, 30]  # exponential backoff seconds
 
 
-def fetch_url(url: str) -> tuple[str, int]:
-    """Fetch URL via curl, return (body, http_code)."""
-    result = subprocess.run(
-        ["curl", "-sL", "-w", "\nHTTP_CODE: %{http_code}", url],
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
+def fetch_url(url: str, timeout: int = 60) -> tuple[str, int]:
+    """Fetch URL via curl, return (body, http_code).
+
+    Returns ("", 0) on timeout or other failures instead of raising.
+    """
+    try:
+        result = subprocess.run(
+            ["curl", "-sL", "--connect-timeout", "30", "-w", "\nHTTP_CODE: %{http_code}", url],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired:
+        print(f"  Timeout fetching {url[:80]}...", file=sys.stderr)
+        return "", 0
+
     output = result.stdout
     # Extract HTTP code
     http_code = 0
@@ -68,6 +76,10 @@ def fetch_url(url: str) -> tuple[str, int]:
 
 
 def is_rate_limited(body: str, http_code: int) -> bool:
+    """Check if the response indicates rate limiting or unavailability."""
+    if http_code == 0 and not body:
+        # Timeout or connection failure — treat as rate limited
+        return True
     return http_code in (429, 503) or "Rate exceeded" in body
 
 
