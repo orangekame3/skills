@@ -26,7 +26,8 @@ arq get --summarize $ARGUMENTS
 ```
 
 これにより以下が `$ARQ_ROOT/arxiv.org/<category>/<id>/` に保存される：
-- `paper.pdf` — PDF
+- `paper.pdf` — 原文 PDF
+- `paper_ja.pdf` — 日本語翻訳 PDF（Mac Studio で自動生成。取得直後は存在しない場合がある）
 - `meta.json` — メタデータ
 - `summary.md` — ar5iv HTML ベースの LLM 生成サマリー（図付き）
 - `assets/` — サマリーに含まれる図
