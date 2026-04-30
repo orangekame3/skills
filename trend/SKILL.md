@@ -1,5 +1,5 @@
 ---
-name: arq-trend
+name: trend
 description: arxiv quant-ph (量子コンピュータ・量子物理) の最新論文トレンドを収集・要約する。情報収集や研究動向の把握に使う。
 argument-hint: "[キーワード(省略可)]"
 compatibility: Requires uv, curl, and arq CLI
@@ -41,7 +41,7 @@ RSS フィードは **土曜・日曜はデータが空** になる（arxiv の 
 `--known` には CWD（life リポジトリ）の `data/known_arxiv_ids.txt` のパスを渡す。
 
 ```bash
-SKILL_DIR="$(dirname "$(readlink -f "$(grep -rl 'name: arq-trend' ~/.claude/skills/*/SKILL.md 2>/dev/null | head -1)")" 2>/dev/null)"
+SKILL_DIR="$(dirname "$(readlink -f "$(grep -rl 'name: trend' ~/.claude/skills/*/SKILL.md 2>/dev/null | head -1)")" 2>/dev/null)"
 uv run "$SKILL_DIR/scripts/arxiv_pipeline.py" --known data/known_arxiv_ids.txt
 ```
 

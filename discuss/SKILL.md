@@ -1,5 +1,5 @@
 ---
-name: arq-discuss
+name: discuss
 description: 既読の論文レポートに対してディスカッション・深堀りを行い、コメントを追記する。論文の記述に厳密にグラウンディングされた回答を行う。
 argument-hint: "<arxiv ID>"
 compatibility: Requires arq CLI
@@ -40,7 +40,7 @@ false の場合は life/reads/ にフォールバック:
 reads/*_$ARGUMENTS.md
 ```
 
-どちらも見つからない場合は、先に `/arq-read $ARGUMENTS` でノートを生成するよう案内する。
+どちらも見つからない場合は、先に `/read $ARGUMENTS` でノートを生成するよう案内する。
 
 ### 2. 論文原文の読み込み
 

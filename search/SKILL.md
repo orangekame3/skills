@@ -1,5 +1,5 @@
 ---
-name: arq-search
+name: search
 description: 特定テーマで arxiv・Web を横断検索し、重要論文をピックアップする。トレンド(日次新着)と異なり、過去論文を含めた自由探索。
 argument-hint: "<検索テーマ（日本語 or 英語）>"
 compatibility: Requires curl and arq CLI
@@ -10,7 +10,7 @@ compatibility: Requires curl and arq CLI
 ## 概要
 
 特定のテーマ・キーワードで arxiv と Web を横断的に検索し、過去の重要論文を含めて探索する。
-`/arq-trend` が日次新着の定点観測なのに対し、`/arq-search` はテーマ駆動の深掘り探索。
+`/trend` が日次新着の定点観測なのに対し、`/search` はテーマ駆動の深掘り探索。
 
 ## 手順
 

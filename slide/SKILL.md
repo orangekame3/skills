@@ -1,5 +1,5 @@
 ---
-name: arq-slide
+name: slide
 description: 精読済み論文のMarpスライドを生成する。reads/ の精読レポートと arq のサマリー・図を組み合わせて発表用スライドを作成。
 argument-hint: "<arxiv ID (例: 2603.29439)>"
 compatibility: Requires arq CLI and marp CLI
@@ -22,7 +22,7 @@ allowed-tools: WebFetch, Bash(arq *), Bash(marp *), Bash(ln *), Bash(mkdir *), B
 reads/*_$ARGUMENTS.md
 ```
 
-レポートが見つからない場合は、先に `/arq-read $ARGUMENTS` でレポートを生成するよう案内する。
+レポートが見つからない場合は、先に `/read $ARGUMENTS` でレポートを生成するよう案内する。
 
 ### 2. 情報の収集
 
