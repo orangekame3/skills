@@ -35,8 +35,22 @@ RSS フィードは **土曜・日曜はデータが空** になる（arxiv の 
 土日に実行する場合、RSS フォールバックでもデータが取得できない可能性がある。
 その場合は「本日は週末のため新着論文なし」と報告して終了する。
 
-### 1. パイプライン実行
+### 1. 事前取得済み JSON の確認
 
+GitHub Actions が平日朝に自動で arxiv API からデータを取得し、`data/daily/` に保存している。
+まず今日の日付の JSON が存在するか確認する。
+
+```bash
+TODAY=$(date +%Y-%m-%d)
+ls data/daily/${TODAY}.json data/daily/${TODAY}_deep.json 2>/dev/null
+```
+
+- **JSON が存在する場合** → Step 1b (arq check) に進む。fetch は不要。
+- **JSON が存在しない場合** → Step 1a (パイプライン実行) でローカル fetch する。
+
+### 1a. パイプライン実行（フォールバック）
+
+事前取得 JSON がない場合のみ実行する。
 `arxiv_pipeline.py` が fetch → parse → merge → arq check をすべて処理する。
 `--known` には CWD（life リポジトリ）の `data/known_arxiv_ids.txt` のパスを渡す。
 
@@ -60,9 +74,34 @@ stdout にマニフェスト JSON が出力される:
 }
 ```
 
+パイプライン実行後は Step 2 に進む。
+
+### 1b. arq check（事前取得 JSON 使用時）
+
+事前取得 JSON を使う場合、arq check のみローカルで実行する（Actions 環境に arq がないためスキップされている）。
+
+```bash
+TODAY=$(date +%Y-%m-%d)
+# JSON を /tmp にコピー（後続ステップとの互換性のため）
+cp "data/daily/${TODAY}.json" /tmp/arxiv_daily.json
+[ -f "data/daily/${TODAY}_deep.json" ] && cp "data/daily/${TODAY}_deep.json" /tmp/arxiv_deep.json
+
+# arq check: 全 paper ID を取得して既読チェック
+python3 -c "
+import json, sys
+ids = []
+for p in ['/tmp/arxiv_daily.json', '/tmp/arxiv_deep.json']:
+    try:
+        ids.extend(json.load(open(p)).get('papers', {}).keys())
+    except FileNotFoundError:
+        pass
+print('\n'.join(ids))
+" | arq has -
+```
+
 ### 2. JSON データの構造
 
-`/tmp/arxiv_daily.json` と `/tmp/arxiv_deep.json` は以下の形式:
+`/tmp/arxiv_daily.json` と `/tmp/arxiv_deep.json`（または `data/daily/` の事前取得版）は以下の形式:
 
 ```json
 {
